@@ -43,7 +43,6 @@ routes.patch("/profiles/:id", async (req, res) => {
         const keys = Object.keys(updateData);
         const keysInModel= ["name", "age", "graduate", "email", "password"]
         const check = keys.every(key => keysInModel.includes(key))
-
         if(!check){
             return res.status(400).send("Invalid field");
         }
@@ -56,7 +55,6 @@ routes.patch("/profiles/:id", async (req, res) => {
             //new amd old data mila ke save kardiya manually!
             Object.assign(user, updateData);
             await user.save();
-
             res.send(user);
         }catch(e){
             res.status(500).send("internal server error");
@@ -71,6 +69,14 @@ routes.delete("/profiles/:id", async (req, res) => {
         }
         res.send(user)
     }catch(e){ res.status(500).send()}
+})
+
+
+routes.post("/profiles/login", async (req, res) => {
+    try{
+        const user = await Profiles.findByCredentials(req.body.email, req.body.password)
+        res.send(user)
+    }catch(e){res.status(500).send("server error")}
 })
 
 module.exports = routes;
