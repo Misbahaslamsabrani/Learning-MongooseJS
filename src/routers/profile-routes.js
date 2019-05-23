@@ -39,22 +39,27 @@ routes.get("/profiles", async (req, res) => {
 })
 
 routes.patch("/profiles/:id", async (req, res) => {
-        const keys = Object.keys(req.body);
-        const keysInModel= ["name", "age", "graduate", "email"]
+        const updateData = req.body;
+        const keys = Object.keys(updateData);
+        const keysInModel= ["name", "age", "graduate", "email", "password"]
         const check = keys.every(key => keysInModel.includes(key))
 
         if(!check){
             return res.status(400).send("Invalid field");
         }
         try{
-            const user = await Profiles.findByIdAndUpdate(req.params.id, 
-                req.body, { new: true, runValidators: true })
+            //const user = await Profiles.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+            const user = await Profiles.findById(req.params.id)
             if(!user){
-                return res.status(404).send()
+                return res.status(404).send("can't update user data, may be this user is already deleted")
             }
-            res.send(user)
+            //new amd old data mila ke save kardiya manually!
+            Object.assign(user, updateData);
+            await user.save();
+
+            res.send(user);
         }catch(e){
-            res.status(500).send(e)
+            res.status(500).send("internal server error");
         }   
 })
 

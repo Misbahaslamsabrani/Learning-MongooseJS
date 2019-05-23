@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
-const Profiles = mongoose.model("Profile", {
+const profileSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -27,7 +28,28 @@ const Profiles = mongoose.model("Profile", {
                 throw new Error("Email is invalid")
             }
         }
+    },
+    password: {
+        type: String,
+        required: true,
+        minLength: 7,
+        trim: true,
+        validate(value){
+            if(value.toLowerCase().includes("password")){
+                throw Error("Password cannot contain word 'passwrod'")
+            }
+        }
     }
 })
+profileSchema.pre("save", async function(next){
+    const user = this;
+    //console.log(user.password, "ye password hai filhal")
+    if(user.isModified("password")){
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+    //console.log(user.password, "password after being hashed");
+    next();
+})
+const Profiles = mongoose.model("Profile", profileSchema )
 
 module.exports = Profiles;
