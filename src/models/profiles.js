@@ -85,6 +85,29 @@ profileSchema.methods.generateAuthToken = async function(){
 
     return token;
 }
+
+profileSchema.methods.toJSON = function(){
+    const profile = this;
+    const publicData = profile.toObject();
+
+    delete publicData.password;
+    delete publicData.tokens;
+
+    console.log(publicData);
+
+    return publicData
+}
+
+profileSchema.statics.toJSON = (profiles) => {
+    const publicData = profiles.map(p => {
+        const temObj = p.toObject();
+        delete temObj.password;
+        delete temObj.tokens;
+        return temObj;
+    })
+    return publicData;
+}
+
 const Profiles = mongoose.model("Profile", profileSchema)
 
 module.exports = Profiles;

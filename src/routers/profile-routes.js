@@ -19,12 +19,12 @@ routes.get("/profiles/myprofile", auth, async (req, res) => {
     //const id = req.params.id
 
     try {
-        
         //const user = await Profiles.findById(id)
         const user = req.profile; 
         /* if (user._id.toString() !== id) {
             res.status(404).send("No user found")
         } */
+       // const user = req.profile.sendPublicDataOnly(); 
         res.send(user)
     } catch (e) {
         res.status(500).send(e)
@@ -37,6 +37,7 @@ routes.get("/profiles", auth, async (req, res) => {
         if (!profiles) {
             res.status(404)
         }
+        //const publicData = await Profiles.sendPublicDataOnly(profiles)
         res.send(profiles)
     } catch (e) {
         res.status(500).send(e)
@@ -84,7 +85,8 @@ routes.delete("/profiles/myprofile", auth,  async (req, res) => {
 routes.post("/profiles/login", async (req, res) => {
     try {
         const user = await Profiles.findByCredentials(req.body.email, req.body.password)
-        const token = await user.generateAuthToken()
+        const token = await user.generateAuthToken();
+        /* const publicData = user.sendPublicDataOnly(); */
         res.status(200).send({ user, token })
     } catch (e) { res.status(500).send("server error") }
 })
@@ -95,7 +97,7 @@ routes.post("/profiles/logout", auth, async(req, res) => {
         profile.tokens = profile.tokens.filter(t => t.token !== token)
 
         await profile.save();
-        res.send()
+        res.send("You're succesfully logout!")
     }catch(e){
         res.status(400).send()
     }
