@@ -52,7 +52,8 @@ const profileSchema = new mongoose.Schema({
 }, { 
     toObject: {
         virtuals: true 
-    }
+    },
+    timestamps: true,
 })
 
 profileSchema.virtual('wishList', {

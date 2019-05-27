@@ -11,7 +11,7 @@ routes.post("/wishlist", auth, async (req, res) => {
         })
 
         await wish.save()
-
+        await wish.populate('wishedBy').execPopulate();
         res.status(201).send(wish)
     }catch(e){
         res.status(500).send("Internal Server Error")
@@ -29,9 +29,9 @@ routes.get("/wishlist/:id", auth, async (req, res) => {
         if(!wish){
             res.status(404).send("No wish list found");
         }
-        console.log(wish, "phele ka")
+        
         await wish.populate('wishedBy').execPopulate();
-        console.log(wish, "bad ka")
+       
         res.send(wish)
     }catch(e){
         res.status(500).send("Internal Server Error")
@@ -43,7 +43,26 @@ routes.get("/wishlist", auth, async (req, res) => {
         /* const wishlists = await WishList.find({
             wishedBy: req.profile._id
         }) */
-        const wishlists = await req.profile.populate("wishList").execPopulate();
+        const {status, limit , skip, sortAt, order} = req.query;
+        const match = {}
+        if(status){
+            match.status = status === "true";
+        }
+        //console.log(match);
+        
+        const sort = {}
+        if(sortAt) {
+            sort[sortAt] = order === "desc" ? -1 : 1;
+        }
+        const wishlists = await req.profile.populate({
+            path: "wishList",
+            match,
+            options: {
+                limit: parseInt(limit),
+                skip: parseInt(skip),
+                sort
+            }
+        }).execPopulate();
         if(!wishlists){
             res.send(404).send("No wishes found")
         }

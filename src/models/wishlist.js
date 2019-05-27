@@ -14,6 +14,8 @@ const wishListScehma = new mongoose.Schema({
         type: Boolean,
         default: false,
     }
+}, {
+    timestamps: true,
 })
 
 const wishList = mongoose.model("WishList", wishListScehma)
