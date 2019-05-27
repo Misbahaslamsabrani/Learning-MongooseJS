@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const WishList = require("./wishlist");
 
 const profileSchema = new mongoose.Schema({
     name: {
@@ -48,6 +49,24 @@ const profileSchema = new mongoose.Schema({
             required: true,
         }
     }]
+}, { 
+    toObject: {
+        virtuals: true 
+    }
+})
+
+profileSchema.virtual('wishList', {
+    ref: 'WishList',
+    localField: '_id',
+    foreignField: 'wishedBy'
+ })
+ 
+profileSchema.pre("remove", async function(next){
+    const profile = this
+    await WishList.deleteMany({
+        wishedBy: profile._id
+    })
+    next();
 })
 profileSchema.pre("save", async function (next) {
     const user = this;

@@ -1,6 +1,7 @@
 require("./db/mongoose");
 const express = require("express");
-const routes = require("./routers/profile-routes")
+const profileRoutes = require("./routers/profile-routes");
+const wishListRoutes = require("./routers/wishlist-routes");
 
 
 const app = express()
@@ -21,8 +22,8 @@ const port = process.env.PORT || 3000;
 }) */
 
 app.use(express.json());
-app.use(routes)
-
+app.use(profileRoutes);
+app.use(wishListRoutes);
 
 /* const newRec = Profiles({
     name: "Misbah",

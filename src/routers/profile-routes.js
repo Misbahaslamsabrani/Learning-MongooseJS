@@ -25,6 +25,7 @@ routes.get("/profiles/myprofile", auth, async (req, res) => {
             res.status(404).send("No user found")
         } */
        // const user = req.profile.sendPublicDataOnly(); 
+       await user.populate('wishList').execPopulate();
         res.send(user)
     } catch (e) {
         res.status(500).send(e)
@@ -75,7 +76,7 @@ routes.delete("/profiles/myprofile", auth,  async (req, res) => {
         if (!user) {
             res.status(404).send()
         } */
-
+        await req.profile.populate('wishList').execPopulate();
         await req.profile.remove()
         res.send(req.profile)
     } catch (e) { res.status(500).send() }
